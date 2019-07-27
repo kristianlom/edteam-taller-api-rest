@@ -14,8 +14,9 @@ type Model struct {
 
 type Storage map[string]*Model
 
-func (s Storage) Create(m *Model) {
+func (s Storage) Create(m *Model) *Model {
 	s[m.Marca] = m
+	return s[m.Marca]
 }
 
 func (s Storage) GetAll() Storage {
