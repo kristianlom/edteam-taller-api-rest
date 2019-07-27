@@ -10,6 +10,7 @@ import (
 func main() {
 	e := echo.New()
 	e.GET("/", holaMundo)
+	e.GET("/mexico", saludaMexico)
 	err := e.Start(":8080")
 	if err != nil {
 		fmt.Printf("No pude subir el servidor %v", err)
@@ -18,4 +19,8 @@ func main() {
 
 func holaMundo(c echo.Context) error {
 	return c.String(http.StatusOK, "hola mundo")
+}
+
+func saludaMexico(c echo.Context) error {
+	return c.String(http.StatusOK, "Saludos desde México")
 }
