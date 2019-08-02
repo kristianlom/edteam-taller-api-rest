@@ -24,3 +24,8 @@
 /Godeps/
 
 # End of https://www.gitignore.io/api/go
+/.idea/edteam-taller-api-rest.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/.gitignore
