@@ -53,7 +53,7 @@ func Login(c echo.Context) error {
 			Codigo:    "O001",
 			Contenido: "Logueado ok",
 		},
-		Data: d,
+		Data: l,
 	}
 	return c.JSON(http.StatusOK, r)
 }
