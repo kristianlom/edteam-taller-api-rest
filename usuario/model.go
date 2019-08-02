@@ -1,5 +1,9 @@
 package usuario
 
+import (
+	"github.com/dgrijalva/jwt-go"
+)
+
 var storage Storage
 
 func init() {
@@ -57,4 +61,9 @@ func (s Storage) Login(e, p string) *Model {
 		}
 	}
 	return nil
+}
+
+type Claim struct {
+	Usuario Model
+	jwt.StandardClaims
 }
