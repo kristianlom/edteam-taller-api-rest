@@ -5,12 +5,16 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func main() {
 	e := echo.New()
 	//e.GET("/", holaMundo)
 	//e.GET("/mexico", saludaMexico)
+	e.Use(middleware.Recover())
+	e.Use(middleware.Logger())
+	e.Use(middleware.CORS())
 	startRoutes(e)
 	err := e.Start(":8080")
 	if err != nil {
