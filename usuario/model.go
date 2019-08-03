@@ -1,6 +1,7 @@
 package usuario
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -39,7 +40,19 @@ func (s Storage) GetAll() Storage {
 	return s
 }
 
-func (s Storage) GetByMarca(e string) *Model {
+func (s Storage) GetAllPaginate(l, p int) []*Model {
+	us := make([]*Model, 0, len(s))
+	for _, v := range s {
+		us = append(us, v)
+		fmt.Println(v)
+	}
+	fmt.Println(us)
+	offset := l*p - l
+	r := us[offset : l*p]
+	return r
+}
+
+func (s Storage) GetByEmail(e string) *Model {
 	if v, ok := s[e]; ok {
 		return v
 	}
@@ -50,8 +63,9 @@ func (s Storage) Delete(e string) {
 	delete(s, e)
 }
 
-func (s Storage) Update(e string, z *Model) {
+func (s Storage) Update(e string, z *Model) *Model {
 	s[e] = z
+	return s[e]
 }
 
 func (s Storage) Login(e, p string) *Model {

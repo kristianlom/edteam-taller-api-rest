@@ -3,11 +3,165 @@ package usuario
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"../respuesta"
 	"github.com/labstack/echo"
 )
+
+func Create(c echo.Context) error {
+	u := &Model{}
+	err := c.Bind(u)
+	if err != nil {
+		r := respuesta.Model{
+			MensajeError: respuesta.MensajeError{
+				Codigo:    "U001",
+				Contenido: "El objeto usuario no tiene la estructura correcta",
+			},
+		}
+
+		return c.JSON(http.StatusBadRequest, r)
+	}
+
+	u = storage.Create(u)
+	r := respuesta.Model{
+		MensajeOK: respuesta.MensajeOK{
+			Codigo:    "U200",
+			Contenido: "Creado correctamente",
+		},
+		Data: u,
+	}
+
+	return c.JSON(http.StatusCreated, r)
+}
+
+func Update(c echo.Context) error {
+	u := &Model{}
+	email := c.Param("email")
+	err := c.Bind(u)
+	if err != nil {
+		r := respuesta.Model{
+			MensajeError: respuesta.MensajeError{
+				Codigo:    "U001",
+				Contenido: "El objeto usuario no tiene la estructura correcta",
+			},
+		}
+
+		return c.JSON(http.StatusBadRequest, r)
+	}
+
+	u = storage.Update(email, u)
+	r := respuesta.Model{
+		MensajeOK: respuesta.MensajeOK{
+			Codigo:    "U201",
+			Contenido: "Actualizado correctamente",
+		},
+		Data: u,
+	}
+
+	return c.JSON(http.StatusOK, r)
+}
+
+func Delete(c echo.Context) error {
+	email := c.Param("email")
+
+	storage.Delete(email)
+	r := respuesta.Model{
+		MensajeOK: respuesta.MensajeOK{
+			Codigo:    "U202",
+			Contenido: "Borrado correctamente",
+		},
+	}
+
+	return c.JSON(http.StatusOK, r)
+}
+
+func GetByEmail(c echo.Context) error {
+	email := c.Param("email")
+	u := storage.GetByEmail(email)
+	if u == nil {
+		r := respuesta.Model{
+			MensajeError: respuesta.MensajeError{
+				Codigo:    "U003",
+				Contenido: "El email no se encuentra",
+			},
+		}
+
+		return c.JSON(http.StatusNotFound, r)
+	}
+
+	rsrc := strings.Split(c.Request().RequestURI, email)[0]
+	rsrc = rsrc[:len(rsrc)-1]
+
+	n1 := respuesta.Navegacion{
+		Descripcion: "Self",
+		Link:        c.Request().RequestURI,
+	}
+	n2 := respuesta.Navegacion{
+		Descripcion: "Resource",
+		Link:        rsrc,
+	}
+	ns := make([]respuesta.Navegacion, 0)
+	ns = append(ns, n1)
+	ns = append(ns, n2)
+
+	r := respuesta.Model{
+		MensajeOK: respuesta.MensajeOK{
+			Codigo:    "U204",
+			Contenido: "Consultado correctamente",
+		},
+		Data: struct {
+			Data       interface{}            `json:"data"`
+			Navegacion []respuesta.Navegacion `json:"navegacion"`
+		}{
+			u,
+			ns,
+		},
+	}
+
+	return c.JSON(http.StatusOK, r)
+}
+
+func GetAll(c echo.Context) error {
+	us := storage.GetAll()
+
+	r := respuesta.Model{
+		MensajeOK: respuesta.MensajeOK{
+			Codigo:    "U205",
+			Contenido: "Consultado correctamente",
+		},
+		Data: us,
+	}
+
+	return c.JSON(http.StatusOK, r)
+}
+
+func GetAllPaginate(c echo.Context) error {
+	l := c.QueryParam("limit")
+	p := c.QueryParam("page")
+
+	limit, err := strconv.Atoi(l)
+	if err != nil {
+		limit = 1
+	}
+	page, err := strconv.Atoi(p)
+	if err != nil {
+		page = 1
+	}
+
+	us := storage.GetAllPaginate(limit, page)
+
+	r := respuesta.Model{
+		MensajeOK: respuesta.MensajeOK{
+			Codigo:    "U205",
+			Contenido: "Consultado correctamente",
+		},
+		Data: us,
+	}
+
+	return c.JSON(http.StatusOK, r)
+}
 
 func Login(c echo.Context) error {
 	u := &Model{}
